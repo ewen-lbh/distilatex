@@ -1,0 +1,13 @@
+[package]
+name = "distilatex"
+version = "0.1.0"
+authors = [ "Ewen Le Bihan <hey@ewen.works>",]
+edition = "2018"
+description = "A LaTeX summarizer, that extracts all theorems & definitions from a .tex file to quickly go over handouts"
+license = "MIT"
+license-file = "LICENSE"
+readme = "README.md"
+repository = "https://github.com/ewen-lbh/distilatex"
+keywords = [ "LaTeX", "summarize", "CLI",]
+
+[dependencies]
