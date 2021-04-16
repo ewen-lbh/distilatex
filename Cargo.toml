@@ -11,3 +11,5 @@ repository = "https://github.com/ewen-lbh/distilatex"
 keywords = [ "LaTeX", "summarize", "CLI",]
 
 [dependencies]
+structopt = "0.3.21"
+
