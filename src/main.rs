@@ -9,7 +9,7 @@ struct Cli {
     /// Commands used to mark implications (opening:closing,opening:closing,...), can be used, multiple times.
     /// Use "@envname" instead of "opening:closing" to specify an environment.
     /// Do not include the backslash.
-    implications_markers: String,
+    markers: String,
 }
 
 #[derive(Debug)]
@@ -48,11 +48,10 @@ impl PartialEq for Marker {
 fn main() {
     let args = Cli::from_args();
     // Parse implication markers
-    let implications_markers = &args.implications_markers
+    let markers = &args.markers
         .split(",")
         .map(Marker::from_string)
         .collect::<Vec<Marker>>();
-    // println!("{:#?}", implications_markers);
 
     // Read from file, remove comments
     let lines = std::fs::read_to_string(&args.file)
@@ -61,7 +60,7 @@ fn main() {
         .filter(|&line| !line.starts_with('%'));
 
     // Declare variables
-    let mut implications: Vec<String> = vec![];
+    let mut summary: Vec<String> = vec![];
     let mut current_chunk: Vec<String> = vec!();
     let mut current_marker: Option<&Marker> = None;
 
@@ -70,18 +69,22 @@ fn main() {
         if line.starts_with("\\section{") {
             break;
         }
-        implications.append(&mut vec![ String::from(line)]);
+        summary.append(&mut vec![ String::from(line)]);
     }
 
     // Collect all chunks
     for line in lines {
-        if line.starts_with("\\section") || line.starts_with("\\subsection") || line.starts_with("\\newcommand") {
-            implications.append(&mut vec![String::from(line)]);
+        // Keep sections, subsections for structure
+        // Keep (re)new{command,environment} commands to not fail to compile
+        if line.starts_with("\\section") || line.starts_with("\\subsection") || line.starts_with("\\newcommand") || line.starts_with("\\renewcommand") || line.starts_with("\\newenvironment") || line.starts_with("\\renewenvironment") {
+            summary.append(&mut vec![String::from(line)]);
             continue;
         }
+
         current_chunk.append(&mut vec![ String::from(line) ]);
+
         if current_marker.is_none() {
-            match implications_markers.iter().find(|&m| line.starts_with(&m.begin)) {
+            match markers.iter().find(|&m| line.starts_with(&m.begin)) {
                 Some(marker) => {
                     current_marker = Some(marker);
                 }
@@ -90,10 +93,10 @@ fn main() {
                 }
             }
         } else {
-            match implications_markers.iter().find(|&m| line.starts_with(&m.end) && m == current_marker.unwrap()) {
+            match markers.iter().find(|&m| line.starts_with(&m.end) && m == current_marker.unwrap()) {
                 Some(_) => {
                     current_marker = None;
-                    implications.append(&mut current_chunk);
+                    summary.append(&mut current_chunk);
                     current_chunk.clear();
                 }
                 None => {
@@ -101,6 +104,8 @@ fn main() {
             }
         }
     }
-    println!("{}\n\\end{{document}}", implications.join("\n"));
+
+    // Don't forget the \end{document} !!
+    println!("{}\n\\end{{document}}", summary.join("\n"));
 }
 
