@@ -1,6 +1,6 @@
 ---
 created: 2021-04-16
-using: [rust]
+made with: [rust]
 tags: [program, cli, school]
 ---
 
