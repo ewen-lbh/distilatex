@@ -52,6 +52,8 @@ function distilatex-quick
 end
 ```
 
+<!--
+
 ### Reading from standard input
 
 You can use `-` as the input file name to tell _distilatex_ to read the file from standard input.
