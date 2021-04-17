@@ -6,9 +6,15 @@ struct Cli {
     #[structopt(parse(from_os_str))]
     file: std::path::PathBuf,
 
-    /// Commands used to mark implications (opening:closing,opening:closing,...), can be used, multiple times.
-    /// Use "@envname" instead of "opening:closing" to specify an environment.
-    /// Do not include the backslash.
+    /// Commands used to delimit what content is included.
+    ///
+    /// Comma-separated list of:
+    ///
+    /// - environment names: @environment
+    ///
+    /// - pairs of command names: begin:end (without the backslashes)
+    ///
+    /// Will be included: anything between lines that start with begin and lines that start with end.
     markers: String,
 }
 
