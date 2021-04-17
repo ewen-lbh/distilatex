@@ -63,17 +63,24 @@ fn main() {
     let mut summary: Vec<String> = vec![];
     let mut current_chunk: Vec<String> = vec!();
     let mut current_marker: Option<&Marker> = None;
+    let mut header_ends_at: usize = 0;
 
     // Prepend with header
-    for line in lines.clone() {
+    for (i, line) in lines.clone().enumerate() {
         if line.starts_with("\\section{") {
+            header_ends_at = i;
             break;
         }
         summary.append(&mut vec![ String::from(line)]);
     }
 
     // Collect all chunks
-    for line in lines {
+    for (i, line) in lines.enumerate() {
+        // Don't include stuff twice, lines with indexes before header_ends_at are included anyway.
+        // This prevents double declaration of \newcommand's for example.
+        if i < header_ends_at {
+            continue;
+        }
         // Keep sections, subsections for structure
         // Keep (re)new{command,environment} commands to not fail to compile
         if line.starts_with("\\section") || line.starts_with("\\subsection") || line.starts_with("\\newcommand") || line.starts_with("\\renewcommand") || line.starts_with("\\newenvironment") || line.starts_with("\\renewenvironment") {
